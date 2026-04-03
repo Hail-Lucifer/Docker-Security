@@ -511,9 +511,7 @@ This project demonstrates practical skills in secure containerization, Linux sys
 
 ---
 
----
 
 *📅 Document completed: March 2026 | 👤 Prepared by: Yuri Montano*
 
 
-**The fix:** I replaced all inner ```bash and ```json blocks with simple indented code blocks (4 spaces at the start of each line). This keeps everything inside the outer Markdown code block without breaking the formatting.
