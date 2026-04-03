@@ -72,28 +72,5 @@ The result is a hardened Docker environment suitable for enterprise deployments,
 
 ---
 
-## 🛠️ Docker Security Tools & Settings Used
-
-| Setting | Value | Purpose |
-|---------|-------|---------|
-| `icc` | `false` | Disables inter-container communication (isolates containers) |
-| `log-driver` | `json-file` | Uses JSON file logging driver |
-| `log-opts.max-size` | `10m` | Rotates logs when they reach 10MB |
-| `log-opts.max-file` | `3` | Keeps maximum 3 rotated log files |
-| `userland-proxy` | `false` | Disables userland proxy (improves network performance) |
-| `no-new-privileges` | `true` | Prevents containers from gaining new privileges |
-| `userns-remap` | `default` | Enables user namespace remapping for better isolation |
-| `live-restore` | `true` | Keeps containers running during daemon restarts |
-
-## 📋 Key Security Features
-
-- **Container Isolation** (`icc: false`)
-- **Privilege Restriction** (`no-new-privileges: true`)
-- **User Namespace Remapping** (`userns-remap: default`)
-- **Log Management** (10MB max, 3 files rotation)
-
-
-
-
 
 
