@@ -1,339 +1,243 @@
-# Secure Containerization with Docker: Deployment, Hardening and DevSecOps Practices
 
-**Prepared by:** Yuri Montano  
-**Date:** March 2026  
+# 🐳 Secure Containerization with Docker  
+### Deployment, Hardening & DevSecOps Practices
 
----
-
-## Introduction
-
-Containerization has become a key technology in modern IT infrastructures, enabling applications to run consistently across different environments. Docker is one of the most widely used containerization platforms, allowing developers and system administrators to package applications and their dependencies into lightweight, portable containers.
-
-While Docker provides efficiency and scalability, it also introduces security challenges. Misconfigured containers, excessive privileges, and untrusted images can expose systems to significant risks. Therefore, securing Docker environments is essential in both development and production contexts.
-
-This project focuses on the deployment and hardening of a Docker environment on Debian 13. It provides a structured, step-by-step approach covering installation, configuration, and the application of security best practices.
+![Docker](https://img.shields.io/badge/Docker-Containerization-blue?logo=docker)
+![Linux](https://img.shields.io/badge/Linux-Debian%2013-red?logo=debian)
+![Security](https://img.shields.io/badge/Security-Hardening-green)
+![DevSecOps](https://img.shields.io/badge/DevSecOps-Practices-purple)
+![Status](https://img.shields.io/badge/Project-Completed-brightgreen)
 
 ---
 
-## Executive Summary
-
-This document provides a comprehensive, security-focused guide to deploying Docker on Debian 13.
-
-### Key Focus Areas
-
-- Security-first configuration from initial setup  
-- Least privilege principles throughout the container lifecycle  
-- Production-ready hardening techniques  
-- Practical DevSecOps implementation  
+## 👤 Author
+**Yuri Montano**  
+📅 March 2026  
 
 ---
 
-## Project Objectives
+## 📋 Project Overview
 
-The main objective is to deploy and secure a Docker environment on Debian 13.
+This project demonstrates how to **securely deploy and harden Docker on Debian 13**, following real-world **DevSecOps and security best practices**.
 
-### Goals
+Unlike basic tutorials, this project focuses on:
 
-- Install Docker securely using official methods  
-- Understand Docker components (images, containers, networking)  
-- Deploy and manage containers safely  
-- Apply security best practices  
-- Demonstrate secure container deployment  
-
----
-
-## Measurable Outcomes
-
-| Objective | Success Criteria |
-|----------|----------------|
-| Installation | Docker installed with GPG verification |
-| Components | Containers running, networks configured |
-| Environment | Resource limits and isolation applied |
-| Security | Least privilege and hardening applied |
-| Demo | Hardened container validated |
+- 🔧 Security-first Docker setup  
+- 🛡 Defense-in-depth architecture  
+- ⚙️ Production-ready configurations  
+- 🔬 Container hardening techniques  
 
 ---
 
-## Environment Preparation (Debian 13)
+## 🎯 Objectives
 
-### System Specifications
+- Install Docker securely using official repositories  
+- Understand core Docker components  
+- Deploy containers in a controlled environment  
+- Apply security best practices (least privilege, isolation)  
+- Demonstrate a hardened production-ready setup  
 
-| Component | Details |
-|----------|--------|
+---
+
+## 🧰 Tech Stack
+
+| Category | Tools |
+|--------|------|
 | OS | Debian 13 (Trixie) |
-| Kernel | Linux 6.x |
-| Architecture | x86_64 |
-| Privileges | sudo/root |
+| Containerization | Docker Engine |
+| Security | CIS Benchmark Practices |
+| Networking | Docker Bridge Networks |
+| DevOps | CLI, Systemd |
 
 ---
 
-## Pre-Installation Security Considerations
+## 🏗 Installation (Secure Method)
 
-- **Attack Surface:** container breakout, image vulnerabilities  
-- **Compliance:** CIS, SOC2, PCI-DSS  
-- **Host Isolation:** dedicated or segmented infrastructure  
+### 1. Update System
 
----
+    sudo apt update && sudo apt upgrade -y
 
-## System Update
+### 2. Install Dependencies
 
-```bash
-sudo apt update
-sudo apt upgrade -y
-```
+    sudo apt install -y ca-certificates curl gnupg lsb-release
 
----
+### 3. Add Docker GPG Key
 
-## Install Prerequisites
+    sudo mkdir -p /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/debian/gpg \
+    | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    sudo chmod 644 /etc/apt/keyrings/docker.gpg
 
-```bash
-sudo apt install -y ca-certificates curl gnupg lsb-release
-```
+### 4. Add Repository
 
----
+    echo "deb [arch=$(dpkg --print-architecture) \
+    signed-by=/etc/apt/keyrings/docker.gpg] \
+    https://download.docker.com/linux/debian \
+    $(lsb_release -cs) stable" \
+    | sudo tee /etc/apt/sources.list.d/docker.list
 
-## System Verification
+### 5. Install Docker
 
-```bash
-lsb_release -a
-uname -a
-```
-
----
-
-## Docker Installation
-
-### Add GPG Key
-
-```bash
-sudo mkdir -p /etc/apt/keyrings
-
-curl -fsSL https://download.docker.com/linux/debian/gpg \
-| sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-
-sudo chmod 644 /etc/apt/keyrings/docker.gpg
-```
+    sudo apt update
+    sudo apt install -y docker-ce docker-ce-cli containerd.io \
+    docker-buildx-plugin docker-compose-plugin
 
 ---
 
-### Add Repository
-
-```bash
-echo "deb [arch=$(dpkg --print-architecture) \
-signed-by=/etc/apt/keyrings/docker.gpg] \
-https://download.docker.com/linux/debian \
-$(lsb_release -cs) stable" \
-| sudo tee /etc/apt/sources.list.d/docker.list
-```
-
----
-
-### Install Docker
-
-```bash
-sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io \
-docker-buildx-plugin docker-compose-plugin
-```
-
----
-
-### Verify Installation
-
-```bash
-sudo systemctl status docker --no-pager
-sudo docker run hello-world
-docker version
-```
-
----
-
-## Post-Installation User Setup
-
-```bash
-sudo groupadd docker
-sudo usermod -aG docker $USER
-newgrp docker
-docker version
-```
-
-> ⚠️ Docker group = root-level privileges
-
----
-
-## Security Hardening
+## 🧱 Security Hardening
 
 ### Docker Daemon Configuration
 
-```bash
-sudo mkdir -p /etc/docker
+    {
+      "icc": false,
+      "log-driver": "json-file",
+      "log-opts": {
+        "max-size": "10m",
+        "max-file": "3"
+      },
+      "userland-proxy": false,
+      "no-new-privileges": true,
+      "userns-remap": "default",
+      "live-restore": true
+    }
 
-sudo tee /etc/docker/daemon.json <<EOF
-{
-  "icc": false,
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "10m",
-    "max-file": "3"
-  },
-  "userland-proxy": false,
-  "no-new-privileges": true,
-  "userns-remap": "default",
-  "live-restore": true
-}
-EOF
-```
+### Key Protections
 
-Restart Docker:
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl restart docker
-```
+- ⛔ Inter-container communication disabled  
+- 📄 Log rotation to prevent disk exhaustion  
+- 🚫 Privilege escalation blocked  
+- 👥 Root mapped to non-privileged user  
+- 🔄 Containers survive daemon restart  
 
 ---
 
-## Network Isolation
+## 🔌 Network Isolation
 
-```bash
-docker network create \
-  --driver bridge \
-  --internal \
-  --subnet=172.20.0.0/16 \
-  secured_network
-```
+    docker network create \
+      --driver bridge \
+      --internal \
+      --subnet=172.20.0.0/16 \
+      secured_network
 
----
-
-## Resource Limiting
-
-```bash
-docker run -d \
-  --name hardened-nginx \
-  --memory="256m" \
-  --cpus="0.5" \
-  --pids-limit=100 \
-  nginx:alpine
-```
+✅ No external internet access  
+✅ Isolated container communication  
 
 ---
 
-## Runtime Security
+## 📊 Resource Limiting
 
-```bash
-docker run -d \
-  --name security-test \
-  --read-only \
-  --cap-drop=ALL \
-  --security-opt=no-new-privileges:true \
-  alpine sleep 3600
-```
+    docker run -d \
+      --memory="256m" \
+      --cpus="0.5" \
+      --pids-limit=100 \
+      nginx:alpine
+
+✅ Prevents DoS attacks  
+✅ Controls CPU & memory usage  
 
 ---
 
-## Image Security
+## 🧬 Runtime Security
 
-```bash
-docker pull alpine:3.19
-docker images
-docker history alpine:3.19
-```
+    docker run -d \
+      --read-only \
+      --cap-drop=ALL \
+      --security-opt=no-new-privileges:true \
+      alpine sleep 3600
+
+✅ Read-only filesystem  
+✅ No Linux capabilities  
+✅ No privilege escalation  
+
+---
+
+## 🖼️ Image Security
+
+    docker pull alpine:3.19
 
 ### Best Practices
 
-- Use official images  
-- Avoid `latest`  
-- Keep images minimal  
-- Update regularly  
+- ✅ Use official images  
+- ⚠️ Avoid `latest` tag  
+- 📉 Keep images minimal  
+- 🔄 Update regularly  
 
 ---
 
-## Secrets Management
+## 🔐 Secrets Management
 
-```bash
-echo "DB_PASSWORD=StrongP@ssw0rd" > .env
-chmod 600 .env
+    echo "DB_PASSWORD=StrongP@ssw0rd" > .env
+    chmod 600 .env
+    docker run --env-file .env alpine env
 
-docker run --env-file .env alpine env
-rm -f .env
-```
-
-> ❗ Never commit `.env` files
+⚠️ Never commit `.env` files to GitHub  
 
 ---
 
-## Security Auditing
+## 🔍 Security Auditing
 
-```bash
-docker ps -a
+    docker ps -a
+    docker stats --no-stream
+    docker inspect <container>
 
-docker inspect $(docker ps -q) \
---format '{{.Name}} | Privileged: {{.HostConfig.Privileged}}'
-
-docker stats --no-stream
-```
-
----
-
-## CIS Benchmark Highlights
-
-| Control | Recommendation |
-|--------|---------------|
-| 1.1 | Keep system updated |
-| 2.1 | Use non-root containers |
-| 2.4 | Enable userns-remap |
-| 4.1 | Read-only filesystem |
-| 5.1 | Trusted images only |
+✅ Detect misconfigurations  
+✅ Monitor resource usage  
+✅ Verify security settings  
 
 ---
 
-## Conclusion
+## ✅ Achievements
 
-This project demonstrated secure Docker deployment on Debian 13 using best practices.
-
----
-
-## Achievements
-
-| Objective | Implementation |
-|----------|---------------|
-| Installation | GPG verified repo |
-| Hardening | daemon.json configured |
-| Isolation | internal network |
-| Security | runtime flags |
-| Resources | limits applied |
+- ✅ Secure Docker installation (GPG verified)  
+- ✅ Hardened daemon configuration  
+- ✅ Network isolation implemented  
+- ✅ Runtime security enforced  
+- ✅ Resource limits applied  
+- ✅ Security auditing demonstrated  
 
 ---
 
-## Skills Demonstrated
+## 🧠 Skills Demonstrated
 
 - Docker & container lifecycle  
-- Linux administration  
-- Security hardening  
-- DevSecOps practices  
+- Linux system administration  
+- Security hardening & best practices  
+- DevSecOps mindset  
 - Technical documentation  
 
 ---
 
-## Key Takeaways
+## 💡 Key Takeaways
 
-1. Security must start from installation  
-2. Defense in depth is critical  
-3. Least privilege reduces risk  
-4. Auditing ensures compliance  
+- 🧩 Security must start at installation  
+- 🧱 Defense in depth is essential  
+- ⚖️ Least privilege reduces attack surface  
+- 📊 Auditing ensures compliance  
 
 ---
 
-## Future Improvements
+## 🔮 Future Improvements
 
-- CIS automated scanning  
-- Docker Content Trust  
-- SIEM integration  
+- CIS Benchmark automated scanning  
+- Docker Content Trust (image signing)  
+- SIEM integration for logging  
 - CI/CD security pipelines  
-- Kubernetes security  
+- Kubernetes security exploration  
 
 ---
 
-## Final Note
+## 📎 Final Thoughts
 
-This project demonstrates practical DevSecOps and container security skills validated on Debian 13.
+This project demonstrates **real-world, production-level Docker security skills**, combining:
+
+- Practical implementation  
+- Security awareness  
+- DevOps best practices  
+
+---
+
+⭐ *If you found this useful, feel free to star the repo!*
+
+
+
+**The fix:** I replaced all inner ```bash and ```json blocks with simple indented code blocks (4 spaces at the start of each line). This keeps everything inside the outer Markdown code block without breaking the formatting.
