@@ -1,10 +1,22 @@
 
-# 🐳 Secure Containerization with Docker: Deployment, Hardening and DevSecOps Practices
+<div align="center">
 
-**👤 Prepared by:** Yuri Montano  
-**📅 Date:** March 2026
+# 🐳 Secure Containerization with Docker
 
----
+### Deployment · Hardening · DevSecOps Practices
+
+![Status](https://img.shields.io/badge/STATUS-COMPLETED-brightgreen)
+![Docker](https://img.shields.io/badge/Docker-26%2B-2496ED?logo=docker&logoColor=white)
+![Debian](https://img.shields.io/badge/Debian-13(Trixie)-A81D33?logo=debian&logoColor=white)
+![Security](https://img.shields.io/badge/Security-CIS%20Benchmark-8A2BE2)
+![DevSecOps](https://img.shields.io/badge/DevSecOps-Practices-FF6B35)
+
+![GPG](https://img.shields.io/badge/GPG-Verified-0078D4)
+![Hardening](https://img.shields.io/badge/Hardening-Level%203-4CAF50)
+![Audit](https://img.shields.io/badge/Audit-Ready-FF9800)
+
+</div>
+
 
 ## 📖 Introduction
 
