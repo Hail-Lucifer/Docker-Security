@@ -83,6 +83,7 @@ For complete installation steps, configuration files, and security hardening det
 
 👉 **[View the Full Secure Containerization Report](./Secure-Containerization-With-Docker.md)**
 
+📘 **[Full commands reference →](DOCKER_COMMANDS.md)**
 ---
 
 ## 🧠 Skills Demonstrated
